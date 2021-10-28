@@ -8,6 +8,32 @@ class PublicationsController < ApplicationController
 
   # GET /publications/1 or /publications/1.json
   def show
+    @articles_published = @publication.articles
+
+		average_articles_published_array = @articles_published.group_by_day(:publication_date).count
+		
+		average_free_articles_published_array = @articles_published.where(premium: "free").group_by_day(:publication_date).count	
+		
+		average_premium_articles_published_array = @articles_published.where(premium: "locked").group_by_day(:publication_date).count
+
+		@average_articles_published = average_articles_published_array.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_articles_published_array.size
+		
+		@average_free_articles_published = average_free_articles_published_array.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_free_articles_published_array.size		
+		
+		@average_premium_articles_published = average_premium_articles_published_array.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_premium_articles_published_array.size
+
+		average_articles_published_array_weekly = @articles_published.group_by_week(:publication_date).count
+		
+		average_free_articles_published_array_weekly = @articles_published.where(premium: "free").group_by_week(:publication_date).count	
+		
+		average_premium_articles_published_array_weekly = @articles_published.where(premium: "locked").group_by_week(:publication_date).count
+
+		@average_articles_published_weekly = average_articles_published_array_weekly.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_articles_published_array_weekly.size
+		
+		@average_free_articles_published_weekly = average_free_articles_published_array_weekly.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_free_articles_published_array_weekly.size		
+		
+		@average_premium_articles_published_weekly = average_premium_articles_published_array_weekly.map { |day| day[1] }.inject{ |sum, el| sum + el }.to_f / average_premium_articles_published_array_weekly.size
+
   end
 
   # GET /publications/new
@@ -59,7 +85,7 @@ class PublicationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_publication
-      @publication = Publication.find_by_slug(params[:slug])
+      @publication = Publication.includes(:articles).find_by_slug(params[:slug])
     end
 
     # Only allow a list of trusted parameters through.

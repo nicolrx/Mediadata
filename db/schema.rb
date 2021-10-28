@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2021_10_28_125309) do
 
   create_table "articles", force: :cascade do |t|
     t.bigint "publication_id", null: false
-    t.bigint "author_id", null: false
+    t.bigint "author_id"
     t.string "title"
     t.string "url"
     t.string "premium"
